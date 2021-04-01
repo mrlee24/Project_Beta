@@ -773,3 +773,15 @@ struct PROJECT_BETA_API FRPGSaveInteractables
 	EInteractionResponse InteractionResponse;
 };
 
+USTRUCT(BlueprintType)
+struct PROJECT_BETA_API FRPGLevelingSystem : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Level;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ExpNeeded;
+};
+

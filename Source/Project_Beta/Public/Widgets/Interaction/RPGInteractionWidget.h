@@ -21,8 +21,8 @@ class PROJECT_BETA_API URPGInteractionWidget : public UUserWidget
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	URPGInventoryComponent* InventoryComponent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", BindWidgetAnim))
-	UWidgetAnimation* FillAnim;
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", BindWidgetAnim))
+	//UWidgetAnimation* FillAnim;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	EInteractionInputType InputType;
@@ -41,6 +41,9 @@ class PROJECT_BETA_API URPGInteractionWidget : public UUserWidget
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	FSlateBrush InteractionKeyIcon;
+
+protected:
+	virtual void NativeConstruct() override;
 
 public:
 	void Init(const FText InInteractionText, const EInteractionInputType InInputType)
@@ -74,9 +77,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetInteractionIcon(UTexture2D* InteractionTexture);
-
-	UWidgetAnimation* GetFillAnim() const { return FillAnim; }
-	void SetFillAnim(UWidgetAnimation* InFillAnim) { FillAnim = InFillAnim; }
 
 public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)

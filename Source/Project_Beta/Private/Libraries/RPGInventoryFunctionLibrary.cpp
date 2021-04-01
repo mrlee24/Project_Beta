@@ -2,6 +2,7 @@
 
 
 #include "Libraries/RPGInventoryFunctionLibrary.h"
+#include "Interfaces/RPGPlayerCharacterInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "Characters/RPGPlayerCharacter.h"
@@ -219,12 +220,12 @@ ARPGPlayerCharacter* URPGInventoryFunctionLibrary::GetPlayerReference()
 
 URPGInventoryComponent* URPGInventoryFunctionLibrary::GetInventoryComponent()
 {
-	ARPGPlayerCharacter* PlayerCharacter = URPGInventoryFunctionLibrary::GetPlayerReference();
+	IRPGPlayerCharacterInterface* PlayerCharacterInterface = Cast<IRPGPlayerCharacterInterface>(URPGInventoryFunctionLibrary::GetPlayerReference());
 
-	//URPGInventoryComponent* InventoryComponent = PlayerCharacter->GetInventoryComponent();
+	URPGInventoryComponent* InventoryComponent = PlayerCharacterInterface->GetInventoryComponent();
 
-	//if (InventoryComponent)
-	//	return InventoryComponent;
+	if (InventoryComponent)
+		return InventoryComponent;
 
 	return nullptr;
 }
@@ -255,5 +256,16 @@ bool URPGInventoryFunctionLibrary::ItemMap_Map_Find(const TMap<int32, FRPGItemDa
 		Value = *CurrentValue;
 		return true;
 	}
+	return false;
+}
+
+bool URPGInventoryFunctionLibrary::LevelingMap_Map_Find(const TMap<int32, float>& TargetMap, const int32& Key, float& Value)
+{
+	if (const float* CurrentValue = TargetMap.Find(Key))
+	{
+		Value = *CurrentValue;
+		return true;
+	}
+
 	return false;
 }

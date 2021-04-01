@@ -57,6 +57,9 @@ class PROJECT_BETA_API URPGInteractableComponent : public UActorComponent, publi
 	UPROPERTY(BlueprintReadWrite, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
 	FTimerHandle MashingKeyTimer;
 
+	UPROPERTY(BlueprintReadWrite, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
+	FTimerHandle ToggleTimerHandle;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
 	bool bCanBeReInitialized;
 
@@ -163,6 +166,13 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+private:
+	UFUNCTION(Category = "Interactable Area | Events")
+	void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult); // Unsolved comment
+
+	UFUNCTION(Category = "Interactable Area | Events")
+	void OnComponentEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex); // Unsolved comment
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Interaction")
@@ -271,4 +281,7 @@ public:
 public:
 	UBoxComponent* GetInteractableArea() const { return InteractableArea; }
 	void SetInteractableArea(UBoxComponent* InInteractableArea) { InteractableArea = InInteractableArea; }
+
+	bool GetIsInteractable() const { return bIsInteractable; }
+	void SetIsInteractable(bool InbIsInteractable) { bIsInteractable = InbIsInteractable; }
 };

@@ -16,6 +16,7 @@
 //#include "Widgets/VendorAndStorage/RPGStorageWidget.h"
 //#include "Widgets/SaveSystem/RPGLoadGameWindowWidget.h"
 #include "Widgets/Interaction/RPGInteractionWidget.h"
+#include "Interfaces/RPGPlayerCharacterInterface.h"
 #include "Libraries/RPGInventoryFunctionLibrary.h"
 #include "Kismet/KismetMathLibrary.h" 	
 #include "Kismet/GameplayStatics.h"
@@ -58,14 +59,43 @@ void URPGInteractableComponent::BeginPlay()
 		}
 	}
 
-	//InteractableArea->OnComponentBeginOverlap.AddDynamic(this, &URPGInteractableComponent::OnComponentBeginOverlap);
-	//InteractableArea->OnComponentEndOverlap.AddDynamic(this, &URPGInteractableComponent::OnComponentEndOverlap);
+	InteractableArea->OnComponentBeginOverlap.AddDynamic(this, &URPGInteractableComponent::OnComponentBeginOverlap);
+	InteractableArea->OnComponentEndOverlap.AddDynamic(this, &URPGInteractableComponent::OnComponentEndOverlap);
+}
+
+void URPGInteractableComponent::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor && OtherActor != GetOwner() && OtherActor->ActorHasTag("Player"))
+	{
+		IRPGPlayerCharacterInterface* PlayerInterfaceRef = Cast<IRPGPlayerCharacterInterface>(OtherActor);
+
+		/*
+			*** Avoiding Begin & End are toggled at the same time ***
+		*/
+		GetWorld()->GetTimerManager().SetTimer
+		(
+			ToggleTimerHandle,
+			[&]()
+			{ PlayerInterfaceRef->GetInteractionComponent()->ToggleInteractionTimer(true); },
+			0.1f,
+			false
+		);
+	}
+}
+
+void URPGInteractableComponent::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor && OtherActor != GetOwner() && OtherActor->ActorHasTag("Player"))
+	{
+		IRPGPlayerCharacterInterface* PlayerInterfaceRef = Cast<IRPGPlayerCharacterInterface>(OtherActor);
+		PlayerInterfaceRef->GetInteractionComponent()->ToggleInteractionTimer(false);
+	}
 }
 
 void URPGInteractableComponent::ToggleIsInteractable(bool bCondition)
 {
-	if (bCondition != bIsInteractable)
-		bIsInteractable = bCondition;
+	if (bCondition != GetIsInteractable())
+		SetIsInteractable(bCondition);
 }
 
 void URPGInteractableComponent::FillInteractionWidgetBorder(float InValue)
@@ -81,7 +111,7 @@ void URPGInteractableComponent::ToggleInteractionWidget(bool bCondition)
 {
 	const ESlateVisibility ReturnValue = (bCondition) ? ESlateVisibility::Visible : ESlateVisibility::Hidden;
 
-	if (bIsInteractable && Interaction_Widget)
+	if (GetIsInteractable() && Interaction_Widget)
 	{
 		Interaction_Widget->SetVisibility(ReturnValue);
 		Interaction_Widget->SetFillDecimalValue(0.05f);
@@ -579,7 +609,7 @@ void URPGInteractableComponent::RemoveInteraction_Implementation()
 		OwnerActor->Destroy(); return;
 
 	InteractableArea = nullptr;
-	bIsInteractable = false;
+	SetIsInteractable(false);
 }
 
 void URPGInteractableComponent::EndInteraction_Implementation()

@@ -4,6 +4,14 @@
 #include "Widgets/Interaction/RPGInteractionWidget.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Libraries/RPGInventoryFunctionLibrary.h"
+
+void URPGInteractionWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	InventoryComponent = URPGInventoryFunctionLibrary::GetInventoryComponent();
+}
 
 void URPGInteractionWidget::SetInteractionIcon(UTexture2D* InteractionTexture)
 {

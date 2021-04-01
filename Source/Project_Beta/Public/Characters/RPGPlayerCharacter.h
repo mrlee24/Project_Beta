@@ -4,23 +4,44 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
+#include "Interfaces/RPGPlayerCharacterInterface.h"
 #include "RPGPlayerCharacter.generated.h"
 
+class URPGInteractionComponent;
+
 UCLASS()
-class PROJECT_BETA_API ARPGPlayerCharacter : public ACharacter
+class PROJECT_BETA_API ARPGPlayerCharacter : public ACharacter, public IRPGPlayerCharacterInterface
 {
 	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	USkeletalMeshComponent* SK_Mesh;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	USpringArmComponent* SpringArmComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* CameraComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	URPGInventoryComponent* InventoryComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	URPGInteractionComponent* InteractionComponent;
 
 public:
 	// Sets default values for this character's properties
 	ARPGPlayerCharacter();
 
+	USkeletalMeshComponent* GetSkeletalMesh() const override { return GetMesh(); }
+	UCameraComponent* GetCameraComponent() const override { return CameraComponent; }
+	URPGInventoryComponent* GetInventoryComponent() const override { return InventoryComponent; }
+	URPGInteractionComponent* GetInteractionComponent() const override { return InteractionComponent; }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-public:	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void TestFunction();
-
 };

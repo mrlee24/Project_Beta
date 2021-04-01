@@ -44,5 +44,7 @@ public:
 	static void ItemData_Array_Set(TArray<FRPGItemData>& TargetArray, int32 Index, const FRPGItemData Item = FRPGItemData(), bool bSizeToFit = false);
 	static bool ItemType_Map_Find(const TMap<EItemType, int32>& TargetMap, const EItemType& Key, int32& Value);
 	static bool ItemMap_Map_Find(const TMap<int32, FRPGItemData>& TargetMap, const int32& Key, FRPGItemData& Value);
+
+	static bool LevelingMap_Map_Find(const TMap<int32, float>& TargetMap, const int32& Key, float& Value);
 	//static bool EquipmentData_Map_Find(const TMultiMap<EItemSlot, FRPGItemData>& TargetMap, const EItemSlot& Key, FRPGItemData& Value);
 };
