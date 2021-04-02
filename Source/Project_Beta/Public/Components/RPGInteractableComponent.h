@@ -20,7 +20,7 @@ class URPGInventoryComponent;
 class URPGInteractionWidget;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
-class PROJECT_BETA_API URPGInteractableComponent : public UActorComponent, public IRPGInteractableInterface
+class PROJECT_BETA_API URPGInteractableComponent : public UActorComponent
 {
 	GENERATED_BODY()
 

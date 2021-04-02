@@ -8,27 +8,28 @@ URPGMovableObjectComponent::URPGMovableObjectComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
 }
 
-
-// Called when the game starts
-void URPGMovableObjectComponent::BeginPlay()
+void URPGMovableObjectComponent::Move_Implementation()
 {
-	Super::BeginPlay();
-
-	// ...
-	
+	GetOnMove().Broadcast();
 }
 
-
-// Called every frame
-void URPGMovableObjectComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void URPGMovableObjectComponent::Reverse_Implementation()
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	OnReverse.Broadcast();
+}
 
-	// ...
+void URPGMovableObjectComponent::Stop_Implementation()
+{
+	OnStop.Broadcast();
+}
+
+void URPGMovableObjectComponent::Finished_Implementation()
+{
+	OnFinished.Broadcast();
 }
 
