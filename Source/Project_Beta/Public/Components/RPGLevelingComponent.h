@@ -8,6 +8,10 @@
 #include "RPGTypes.h"
 #include "RPGLevelingComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGainedExperience);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLevelChanged);
+
+class URPGLevelExpNotifyWidget;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECT_BETA_API URPGLevelingComponent : public UActorComponent
@@ -29,6 +33,15 @@ class PROJECT_BETA_API URPGLevelingComponent : public UActorComponent
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TMap<int32, float> LevelingData;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<URPGLevelExpNotifyWidget> LevelExpNotify_Class;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnGainedExperience OnGainedExperience;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnLevelChanged OnLevelChanged;
+
 public:	
 	// Sets default values for this component's properties
 	URPGLevelingComponent();
@@ -41,8 +54,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void Initialize();
 
-	//UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void AddLevelExp(const float Experience = 0.f);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void LevelUp();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetLevel(const int32 Level);
 
 public:
 	UFUNCTION(BlueprintCallable)
