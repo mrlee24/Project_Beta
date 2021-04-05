@@ -218,16 +218,61 @@ enum class EStatCategory : uint8
 	Damage,
 	AttackSpeed
 };
+
+UENUM(BlueprintType)
+enum class EAttributeCategory : uint8
+{
+	None,
+	Vitality,
+	Endurance,
+	Strength,
+	Dexterity,
+	Resistance,
+	Intelligence,
+	Faith,
+	Magic,
+	Luck
+};
+
 USTRUCT(BlueprintType)
 struct PROJECT_BETA_API FRPGStatRow
 {
 	GENERATED_BODY()
 
+	FRPGStatRow() {};
+
+	FRPGStatRow(const EStatCategory InStat, const int32 InValue)
+		: Stat(InStat)
+		, Value(InValue)
+	{}
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EStatCategory Stat;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Value;
+	int32 Value;
+
+	bool operator==(const FRPGStatRow& Other) const
+	{
+		return Stat == Other.Stat && Value == Other.Value;
+	}
+
+	bool operator!=(const FRPGStatRow& Other) const
+	{
+		return !(*this == Other);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct PROJECT_BETA_API FRPGAttributeRow
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EAttributeCategory Attribute;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FRPGStatRow> Stats;
 };
 
 USTRUCT(BlueprintType)

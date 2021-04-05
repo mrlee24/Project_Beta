@@ -196,6 +196,21 @@ TArray<FRPGItemData> URPGInventoryFunctionLibrary::QuickSortItems(const TArray<F
 	return SortedArray;
 }
 
+void URPGInventoryFunctionLibrary::FindItemStat(const TArray<FRPGStatRow> DataArray, const EStatCategory Stat, bool& bFound , int32& StatIndex)
+{
+	for (int32 Index = 0; Index < DataArray.Num(); Index++)
+	{
+		if (Stat == DataArray[Index].Stat)
+		{
+			bFound = true;
+			StatIndex = Index;
+			return;
+		}
+	}
+
+	bFound = false;
+}
+
 TArray<FRPGItemData> URPGInventoryFunctionLibrary::GetAllItemsOfType(const TArray<FRPGItemData> DataArray, const EItemType ItemType)
 {
 	TArray<FRPGItemData> SeparatedItems;

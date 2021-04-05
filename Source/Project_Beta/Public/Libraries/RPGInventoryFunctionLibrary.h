@@ -32,6 +32,10 @@ class PROJECT_BETA_API URPGInventoryFunctionLibrary : public UBlueprintFunctionL
 
 public:
 	UFUNCTION(BlueprintCallable)
+	static void FindItemStat(const TArray<FRPGStatRow> DataArray, const EStatCategory Stat, bool& bFound, int32& StatIndex);
+
+public:
+	UFUNCTION(BlueprintCallable)
 	static TArray<FRPGItemData> GetAllItemsOfType(const TArray<FRPGItemData> DataArray, const EItemType ItemType);
 
 	UFUNCTION(BlueprintCallable)

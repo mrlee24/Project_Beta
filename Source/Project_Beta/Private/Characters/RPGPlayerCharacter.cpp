@@ -4,6 +4,7 @@
 #include "Characters/RPGPlayerCharacter.h"
 #include "Components/RPGInventoryComponent.h"
 #include "Components/RPGInteractionComponent.h"
+#include "Components/RPGAttributeComponent.h"
 
 // Sets default values
 ARPGPlayerCharacter::ARPGPlayerCharacter()
@@ -24,6 +25,7 @@ ARPGPlayerCharacter::ARPGPlayerCharacter()
 
 	InventoryComponent = CreateDefaultSubobject<URPGInventoryComponent>(TEXT("AC_Inventory"));
 	InteractionComponent = CreateDefaultSubobject<URPGInteractionComponent>(TEXT("AC_Interaction"));
+	AttributeComponent = CreateDefaultSubobject<URPGAttributeComponent>(TEXT("AC_Attribute"));
 }
 
 // Called when the game starts or when spawned
