@@ -22,9 +22,6 @@ class PROJECT_BETA_API URPGAttributeComponent : public UActorComponent
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	TArray<FRPGStatRow> Stats;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
-	TArray<FRPGStatRow> StatModifiers;
-
 private:
 	void FindStatInStatsArray(const EStatCategory InStat, bool& bFound, FRPGStatRow& OutStatRow) const;
 
@@ -33,19 +30,22 @@ public:
 	URPGAttributeComponent();
 
 	UFUNCTION(BlueprintCallable)
-	void AddModifier(const EStatCategory Index, const int32 Modifier, bool& bIsAdded);
-
-	UFUNCTION(BlueprintCallable)
-	void RemoveModifier(const EStatCategory Index, const int32 Modifier, bool& bIsRemoved);
-
-	UFUNCTION(BlueprintCallable)
-	int32 ClampToMaxStatValues(const EStatCategory InStat, const int32 InValue = 0) const;
+	float ClampToMaxStatValues(const EStatCategory InStat, const float InValue = 0) const;
 
 	UFUNCTION(BlueprintCallable)
 	int32 GetStatIndex(const EStatCategory Stat) const;
 
 	UFUNCTION(BlueprintCallable)
 	float GetStatValue(const EStatCategory Stat) const;
+
+	UFUNCTION(BlueprintCallable)
+	void SetStatValue(const EStatCategory Stat, const float Value = 0.f);
+
+	UFUNCTION(BlueprintCallable)
+	void AddItemStats(const FRPGItemData ItemData);
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveItemStats(const FRPGItemData ItemData);
 
 protected:
 	// Called when the game starts

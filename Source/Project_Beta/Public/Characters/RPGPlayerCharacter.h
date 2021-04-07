@@ -8,6 +8,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Interfaces/RPGPlayerCharacterInterface.h"
+#include "RPGTypes.h"
 #include "RPGPlayerCharacter.generated.h"
 
 class URPGInteractionComponent;
@@ -49,6 +50,9 @@ public:
 
 	URPGAttributeComponent* GetAttributeComponent() const { return AttributeComponent; }
 	void SetAttributeComponent(URPGAttributeComponent* InAttributeComponent) { AttributeComponent = InAttributeComponent; }
+
+	UFUNCTION(BlueprintCallable)
+	void TestFUNC(UPARAM(ref) FRPGStatRow& Row, FRPGStatRow& OutRow);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -162,7 +162,6 @@ enum class EItemType : uint8
 {
 	None,
 	Weapon,
-	Shield,
 	Armor,
 	Ammo,
 	Accessory,
@@ -241,7 +240,7 @@ struct PROJECT_BETA_API FRPGStatRow
 
 	FRPGStatRow() {};
 
-	FRPGStatRow(const EStatCategory InStat, const int32 InValue)
+	FRPGStatRow(const EStatCategory InStat, const float InValue)
 		: Stat(InStat)
 		, Value(InValue)
 	{}
@@ -250,7 +249,7 @@ struct PROJECT_BETA_API FRPGStatRow
 	EStatCategory Stat;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Value;
+	float Value;
 
 	bool operator==(const FRPGStatRow& Other) const
 	{
@@ -685,8 +684,8 @@ struct PROJECT_BETA_API FRPGInventoryPanelData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EInventoryPanel Panel;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//EInventoryPanel Panel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Size;

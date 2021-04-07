@@ -7,7 +7,7 @@
 
 void URPGAttributeComponent::FindStatInStatsArray(const EStatCategory InStat, bool& bFound, FRPGStatRow& OutStatRow) const
 {
-	const int32 StatIndex = GetStatIndex(InStat);
+	const float StatIndex = GetStatIndex(InStat);
 
 	if (StatIndex != -1)
 	{
@@ -29,27 +29,7 @@ URPGAttributeComponent::URPGAttributeComponent()
 	// ...
 }
 
-
-void URPGAttributeComponent::AddModifier(const EStatCategory Index, const int32 Modifier, bool& bIsAdded)
-{
-	if (Modifier == 0) return;
-
-	FRPGStatRow NewRow = { Index, Modifier };
-	StatModifiers.Add(NewRow);
-	bIsAdded = true;
-}
-
-void URPGAttributeComponent::RemoveModifier(const EStatCategory Index, const int32 Modifier, bool& bIsRemoved)
-{
-	if (Modifier == 0) return;
-
-	FRPGStatRow RowToBeRemoved = { Index, Modifier };
-	StatModifiers.Remove(RowToBeRemoved);
-	StatModifiers.Shrink();
-	bIsRemoved = true;
-}
-
-int32 URPGAttributeComponent::ClampToMaxStatValues(const EStatCategory InStat, const int32 InValue /*= 0.f*/) const
+float URPGAttributeComponent::ClampToMaxStatValues(const EStatCategory InStat, const float InValue /*= 0.f*/) const
 {
 	if (InStat == EStatCategory::Health || InStat == EStatCategory::Stamina || InStat == EStatCategory::Mana)
 	{
@@ -95,6 +75,47 @@ float URPGAttributeComponent::GetStatValue(const EStatCategory Stat) const
 	FindStatInStatsArray(Stat, bFound, OutStatRow);
 
 	return (bFound) ? OutStatRow.Value : 0.f;
+}
+
+void URPGAttributeComponent::SetStatValue(const EStatCategory Stat, const float Value /*= 0.f*/)
+{
+	FRPGStatRow StatRow;
+	bool bFound;
+	FindStatInStatsArray(Stat, bFound, StatRow);
+
+	StatRow.Value = ClampToMaxStatValues(Stat, Value);
+}
+
+void URPGAttributeComponent::AddItemStats(const FRPGItemData ItemData)
+{
+	for (auto& StatRow : ItemData.Stats.Stats)
+	{
+		bool bFound = false;
+		FRPGStatRow OutStatRow;
+		FindStatInStatsArray(StatRow.Stat, bFound, OutStatRow);
+
+		if (bFound)
+		{
+			float ValueModifier = OutStatRow.Value + StatRow.Value;
+			OutStatRow.Value = ClampToMaxStatValues(OutStatRow.Stat, ValueModifier);
+		}
+	}
+}
+
+void URPGAttributeComponent::RemoveItemStats(const FRPGItemData ItemData)
+{
+	for (auto& StatRow : ItemData.Stats.Stats)
+	{
+		bool bFound = false;
+		FRPGStatRow OutStatRow;
+		FindStatInStatsArray(StatRow.Stat, bFound, OutStatRow);
+
+		if (bFound)
+		{
+			float ValueModifier = OutStatRow.Value - StatRow.Value;
+			OutStatRow.Value = ClampToMaxStatValues(OutStatRow.Stat, ValueModifier);
+		}
+	}
 }
 
 // Called when the game starts

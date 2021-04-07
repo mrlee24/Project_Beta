@@ -3,6 +3,7 @@
 
 #include "Libraries/RPGInventoryFunctionLibrary.h"
 #include "Interfaces/RPGPlayerCharacterInterface.h"
+#include "Actors/Interactables/RPGItemBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "Characters/RPGPlayerCharacter.h"
@@ -11,7 +12,6 @@ TArray<FRPGItemData> URPGInventoryFunctionLibrary::SortItemsByType(const TArray<
 {
 	TArray<FRPGItemData> Armor;
 	TArray<FRPGItemData> Weapons;
-	TArray<FRPGItemData> Shields;
 	TArray<FRPGItemData> Ammo;
 	TArray<FRPGItemData> Accessories;
 	TArray<FRPGItemData> Potions;
@@ -32,10 +32,6 @@ TArray<FRPGItemData> URPGInventoryFunctionLibrary::SortItemsByType(const TArray<
 
 			case EItemType::Weapon:
 				Weapons.Add(ArrayElement);
-				break;
-
-			case EItemType::Shield:
-				Shields.Add(ArrayElement);
 				break;
 
 			case EItemType::Ammo:
@@ -63,7 +59,6 @@ TArray<FRPGItemData> URPGInventoryFunctionLibrary::SortItemsByType(const TArray<
 
 	SortedArray.Append(Armor);
 	SortedArray.Append(Weapons);
-	SortedArray.Append(Shields);
 	SortedArray.Append(Ammo);
 	SortedArray.Append(Accessories);
 	SortedArray.Append(Potions);
@@ -196,6 +191,98 @@ TArray<FRPGItemData> URPGInventoryFunctionLibrary::QuickSortItems(const TArray<F
 	return SortedArray;
 }
 
+void URPGInventoryFunctionLibrary::FindEmptyEquipmentSlot(const TMultiMap<FRPGItemSlot, FRPGItemData> EquipmentData, const TArray<FRPGItemSlot> SlotsToSearch, const FRPGItemSlot DefaulSlot, FRPGItemSlot& SlotFound, bool& bFound)
+{
+	FRPGItemData Item;
+	FRPGItemSlot Slot;
+	for (auto& ItemSlot : SlotsToSearch)
+	{
+
+		if (URPGInventoryFunctionLibrary::EquipmentData_Map_Find(EquipmentData, ItemSlot, Item))
+		{
+			if (Item.Class == NULL)
+			{
+				bFound = true;
+				Slot = ItemSlot;
+				break;
+			}
+		}
+	}
+
+	SlotFound = (bFound) ? Slot : DefaulSlot;
+}
+
+bool URPGInventoryFunctionLibrary::HasPartialStack(const TArray<FRPGItemData> DataArray, FRPGItemData ItemData, int32& SlotIndex)
+{
+	bool bFound = false;
+
+	for (int32 Index = 0; Index < DataArray.Num(); Index++)
+	{
+		if (DataArray[Index].Description.Name.EqualTo(ItemData.Description.Name, ETextComparisonLevel::Type::Default) && DataArray[Index].Stacks.bStackable && ItemData.Stacks.bStackable)
+		{
+			SlotIndex = Index;
+			return bFound = true;
+		}
+	}
+
+	if (!bFound)
+		SlotIndex = -1;
+
+	return bFound = false;
+}
+
+bool URPGInventoryFunctionLibrary::HasSpaceInDataArray(TArray<FRPGItemData>& DataArray, int32& SlotIndex)
+{
+	bool bFound = false;
+
+	for (int32 Index = 0; Index < DataArray.Num(); Index++)
+	{
+		if (!DataArray[Index].IsValid())
+		{
+			SlotIndex = Index;
+			bFound = true;
+			break;
+		}
+	}
+
+	return (bFound) ? true : false;
+}
+
+bool URPGInventoryFunctionLibrary::CanItemBeRemoved(const FRPGItemData ItemData)
+{
+	return ItemData.Use.RemoveType != EItemRemoveType::CannotBeRemoved;
+}
+
+void URPGInventoryFunctionLibrary::FindItemIndex(const TArray<FRPGItemData> DataArray, const FRPGItemData SecondItem, bool& bFound, int32& SlotIndex)
+{
+	for (int32 Index = 0; Index < DataArray.Num(); Index++)
+	{
+		if (DataArray[Index] == SecondItem)
+		{
+			bFound = true;
+			SlotIndex = Index;
+			return;
+		}
+	}
+
+	bFound = false;
+}
+
+void URPGInventoryFunctionLibrary::FindItemByID(const TArray<FRPGItemData> DataArray, const FString ItemID, bool& bFound, FRPGItemData& ItemFound)
+{
+	for (int32 Index = 0; Index < DataArray.Num(); Index++)
+	{
+		if (DataArray[Index].Description.ID == ItemID)
+		{
+			bFound = true;
+			ItemFound = DataArray[Index];
+			return;
+		}
+	}
+
+	bFound = false;
+}
+
 void URPGInventoryFunctionLibrary::FindItemStat(const TArray<FRPGStatRow> DataArray, const EStatCategory Stat, bool& bFound , int32& StatIndex)
 {
 	for (int32 Index = 0; Index < DataArray.Num(); Index++)
@@ -209,6 +296,14 @@ void URPGInventoryFunctionLibrary::FindItemStat(const TArray<FRPGStatRow> DataAr
 	}
 
 	bFound = false;
+}
+
+bool URPGInventoryFunctionLibrary::AreItemsStackable(const FRPGItemData FirstItem, const FRPGItemData SecondItem)
+{
+	if (FirstItem.IsStackable() && SecondItem.IsStackable())
+		return true;
+
+	return false;
 }
 
 TArray<FRPGItemData> URPGInventoryFunctionLibrary::GetAllItemsOfType(const TArray<FRPGItemData> DataArray, const EItemType ItemType)
@@ -282,5 +377,15 @@ bool URPGInventoryFunctionLibrary::LevelingMap_Map_Find(const TMap<int32, float>
 		return true;
 	}
 
+	return false;
+}
+
+bool URPGInventoryFunctionLibrary::EquipmentData_Map_Find(const TMultiMap<FRPGItemSlot, FRPGItemData>& TargetMap, const FRPGItemSlot& Key, FRPGItemData& Value)
+{
+	if (const FRPGItemData* CurrentValue = TargetMap.Find(Key))
+	{
+		Value = *CurrentValue;
+		return true;
+	}
 	return false;
 }

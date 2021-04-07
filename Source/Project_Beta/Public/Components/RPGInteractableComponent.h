@@ -284,4 +284,7 @@ public:
 
 	bool GetIsInteractable() const { return bIsInteractable; }
 	void SetIsInteractable(bool InbIsInteractable) { bIsInteractable = InbIsInteractable; }
+
+	float GetVendorGold() const { return VendorGold; }
+	void SetVendorGold(float InVendorGold) { VendorGold = InVendorGold; }
 };

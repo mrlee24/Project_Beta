@@ -28,9 +28,14 @@ ARPGPlayerCharacter::ARPGPlayerCharacter()
 	AttributeComponent = CreateDefaultSubobject<URPGAttributeComponent>(TEXT("AC_Attribute"));
 }
 
+void ARPGPlayerCharacter::TestFUNC(UPARAM(ref) FRPGStatRow& Row, FRPGStatRow& OutRow)
+{
+	Row.Value += 1;
+	OutRow = Row;
+}
+
 // Called when the game starts or when spawned
 void ARPGPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
