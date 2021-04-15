@@ -13,7 +13,7 @@ class URPGCraftingItemWidget;
 class URPGCraftingWindowWidget;
 class URPGCraftingRequiredSlotWidget;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
 class PROJECT_BETA_API URPGCraftingComponent : public UActorComponent
 {
 	GENERATED_BODY()

@@ -5,6 +5,8 @@
 #include "Components/RPGInventoryComponent.h"
 #include "Components/RPGInteractionComponent.h"
 #include "Components/RPGAttributeComponent.h"
+#include "Components/RPGEquipmentComponent.h"
+#include "Components/RPGLevelingComponent.h"
 
 // Sets default values
 ARPGPlayerCharacter::ARPGPlayerCharacter()
@@ -26,6 +28,8 @@ ARPGPlayerCharacter::ARPGPlayerCharacter()
 	InventoryComponent = CreateDefaultSubobject<URPGInventoryComponent>(TEXT("AC_Inventory"));
 	InteractionComponent = CreateDefaultSubobject<URPGInteractionComponent>(TEXT("AC_Interaction"));
 	AttributeComponent = CreateDefaultSubobject<URPGAttributeComponent>(TEXT("AC_Attribute"));
+	EquipmentComponent = CreateDefaultSubobject<URPGEquipmentComponent>(TEXT("AC_Equipment"));
+	LevelingComponent = CreateDefaultSubobject<URPGLevelingComponent>(TEXT("AC_Level"));
 }
 
 void ARPGPlayerCharacter::TestFUNC(UPARAM(ref) FRPGStatRow& Row, FRPGStatRow& OutRow)

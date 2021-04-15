@@ -8,7 +8,11 @@
 
 class URPGInventoryComponent;
 class URPGInteractionComponent;
+class URPGAttributeComponent;
+class URPGEquipmentComponent;
 class USkeletalMeshComponent;
+class URPGLevelingComponent;
+class URPGCraftingComponent;
 class UCameraComponent;
 
 // This class does not need to be modified.
@@ -18,9 +22,6 @@ class URPGPlayerCharacterInterface : public UInterface
 	GENERATED_BODY()
 };
 
-/**
- * 
- */
 class PROJECT_BETA_API IRPGPlayerCharacterInterface
 {
 	GENERATED_BODY()
@@ -31,4 +32,8 @@ public:
 	virtual UCameraComponent* GetCameraComponent() const = 0;
 	virtual URPGInventoryComponent* GetInventoryComponent() const = 0;
 	virtual URPGInteractionComponent* GetInteractionComponent() const = 0;
+	virtual URPGAttributeComponent* GetAttributeComponent() const = 0;
+	virtual URPGEquipmentComponent* GetEquipmentComponent() const = 0;
+	virtual URPGLevelingComponent* GetLevelingComponent() const = 0;
+	virtual URPGCraftingComponent* GetCraftingComponent() const = 0;
 };

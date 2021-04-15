@@ -22,10 +22,10 @@ class PROJECT_BETA_API URPGToolTipStatRowWidget : public UUserWidget
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Defaults", meta = (AllowPrivateAccess = "true", BindWidget))
 	UTextBlock* StatValue_Text;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Defaults", meta = (AllowPrivateAccess = "true"))
-	FRPGItemStat ItemStat;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defaults", meta = (AllowPrivateAccess = "true"))
+	FRPGStatRow StatRow;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Defaults", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defaults", meta = (AllowPrivateAccess = "true"))
 	FText StatName = FText::FromString("StatName");
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Defaults", meta = (AllowPrivateAccess = "true"))
@@ -35,13 +35,22 @@ protected:
 	virtual void NativePreConstruct() override;
 
 public:
+	UTextBlock* GetComparisonValue_Text() const { return ComparisonValue_Text; }
+	void SetComparisonValue_Text(UTextBlock* InComparisonValue_Text) { ComparisonValue_Text = InComparisonValue_Text; }
+
+	float GetComparisonValue() const { return ComparisonValue; }
+	void SetComparisonValue(float InComparisonValue) { ComparisonValue = InComparisonValue; }
+
+	FRPGStatRow GetStatRow() const { return StatRow; }
+	void SetStatRow(FRPGStatRow InStatRow) { StatRow = InStatRow; }
+public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void SetItemValue(const float Value);
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FText GetComparisonValue() const;
+	FText UpdateComparisonValue() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FSlateColor GetComparisonColor() const;
+	FSlateColor UpdateComparisonColor() const;
 };

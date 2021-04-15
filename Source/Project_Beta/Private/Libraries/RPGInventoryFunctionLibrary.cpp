@@ -22,7 +22,7 @@ TArray<FRPGItemData> URPGInventoryFunctionLibrary::SortItemsByType(const TArray<
 
 	for (auto& ArrayElement : DataArray)
 	{
-		if (ArrayElement.Type != EItemType::None)
+		/*if (ArrayElement.Type != EItemType::None)
 		{
 			switch (ArrayElement.Type)
 			{
@@ -54,7 +54,7 @@ TArray<FRPGItemData> URPGInventoryFunctionLibrary::SortItemsByType(const TArray<
 				QuestItems.Add(ArrayElement);
 				break;
 			}
-		}
+		}*/
 	}
 
 	SortedArray.Append(Armor);
@@ -182,11 +182,11 @@ TArray<FRPGItemData> URPGInventoryFunctionLibrary::QuickSortItems(const TArray<F
 {
 	TArray<FRPGItemData> SortedArray;
 
-	for (auto& ArrayElement : DataArray)
-	{
-		if (ArrayElement.IsValid())
-			SortedArray.Add(ArrayElement);
-	}
+	//for (auto& ArrayElement : DataArray)
+	//{
+	//	if (ArrayElement.IsValid())
+	//		SortedArray.Add(ArrayElement);
+	//}
 
 	return SortedArray;
 }
@@ -340,14 +340,68 @@ URPGInventoryComponent* URPGInventoryFunctionLibrary::GetInventoryComponent()
 	return nullptr;
 }
 
-void URPGInventoryFunctionLibrary::ItemData_Array_Set(TArray<FRPGItemData>& TargetArray, int32 Index, const FRPGItemData Item /*= FRPGItemData()*/, bool bSizeToFit /*= false*/)
+URPGEquipmentComponent* URPGInventoryFunctionLibrary::GetEquipmentComponent()
 {
-	if (!TargetArray.IsValidIndex(Index) && bSizeToFit && (Index >= 0))
-		(&TargetArray)->SetNum(Index + 1);
+	IRPGPlayerCharacterInterface* PlayerCharacterInterface = Cast<IRPGPlayerCharacterInterface>(URPGInventoryFunctionLibrary::GetPlayerReference());
 
-	if (TargetArray.IsValidIndex(Index))
-		TargetArray[Index] = Item;
+	URPGEquipmentComponent* EquipmentComponent = PlayerCharacterInterface->GetEquipmentComponent();
+
+	if (EquipmentComponent)
+		return EquipmentComponent;
+
+	return nullptr;
 }
+
+URPGLevelingComponent* URPGInventoryFunctionLibrary::GetLevelingComponent()
+{
+	IRPGPlayerCharacterInterface* PlayerCharacterInterface = Cast<IRPGPlayerCharacterInterface>(URPGInventoryFunctionLibrary::GetPlayerReference());
+
+	URPGLevelingComponent* LevelingComponent = PlayerCharacterInterface->GetLevelingComponent();
+
+	if (LevelingComponent)
+		return LevelingComponent;
+
+	return nullptr;
+}
+
+URPGAttributeComponent* URPGInventoryFunctionLibrary::GetAttributeComponent()
+{
+	IRPGPlayerCharacterInterface* PlayerCharacterInterface = Cast<IRPGPlayerCharacterInterface>(URPGInventoryFunctionLibrary::GetPlayerReference());
+
+	URPGAttributeComponent* LevelingComponent = PlayerCharacterInterface->GetAttributeComponent();
+
+	if (LevelingComponent)
+		return LevelingComponent;
+
+	return nullptr;
+}
+
+URPGCraftingComponent* URPGInventoryFunctionLibrary::GetCraftingComponent()
+{
+	IRPGPlayerCharacterInterface* PlayerCharacterInterface = Cast<IRPGPlayerCharacterInterface>(URPGInventoryFunctionLibrary::GetPlayerReference());
+
+	URPGCraftingComponent* CraftingComponent = PlayerCharacterInterface->GetCraftingComponent();
+
+	if (CraftingComponent)
+		return CraftingComponent;
+
+	return nullptr;
+}
+
+bool URPGInventoryFunctionLibrary::IsItemValid(const FRPGItemData ItemData)
+{
+	return ItemData.IsValid();
+}
+
+//
+//void URPGInventoryFunctionLibrary::ItemData_Array_Set(TArray<FRPGItemData>& TargetArray, int32 Index, const FRPGItemData Item /*= FRPGItemData()*/, bool bSizeToFit /*= false*/)
+//{
+//	if (!TargetArray.IsValidIndex(Index) && bSizeToFit && (Index >= 0))
+//		(&TargetArray)->SetNum(Index + 1);
+//
+//	if (TargetArray.IsValidIndex(Index))
+//		TargetArray[Index] = Item;
+//}
 
 bool URPGInventoryFunctionLibrary::ItemType_Map_Find(const TMap<EItemType, int32>& TargetMap, const EItemType& Key, int32& Value)
 {

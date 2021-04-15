@@ -9,7 +9,7 @@
 #include "RPGAttributeComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
 class PROJECT_BETA_API URPGAttributeComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -24,6 +24,9 @@ class PROJECT_BETA_API URPGAttributeComponent : public UActorComponent
 
 private:
 	void FindStatInStatsArray(const EStatCategory InStat, bool& bFound, FRPGStatRow& OutStatRow) const;
+
+public:
+	FRPGStatRow* FindStatInStatsArray(const EStatCategory InStat, bool& bFound);
 
 public:	
 	// Sets default values for this component's properties

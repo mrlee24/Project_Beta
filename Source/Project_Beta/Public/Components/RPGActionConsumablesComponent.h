@@ -7,7 +7,7 @@
 #include "RPGActionConsumablesComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
 class PROJECT_BETA_API URPGActionConsumablesComponent : public UActorComponent
 {
 	GENERATED_BODY()

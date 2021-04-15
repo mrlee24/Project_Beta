@@ -8,6 +8,11 @@
 #include "RPGInventoryFunctionLibrary.generated.h"
 
 class ARPGPlayerCharacter;
+class URPGInventoryComponent;
+class URPGEquipmentComponent;
+class URPGAttributeComponent;
+class URPGLevelingComponent;
+class URPGCraftingComponent;
 
 UCLASS()
 class PROJECT_BETA_API URPGInventoryFunctionLibrary : public UBlueprintFunctionLibrary
@@ -64,8 +69,23 @@ public:
 	UFUNCTION(BlueprintCallable)
 	static URPGInventoryComponent* GetInventoryComponent();
 
+	UFUNCTION(BlueprintCallable)
+	static URPGEquipmentComponent* GetEquipmentComponent();
+
+	UFUNCTION(BlueprintCallable)
+	static URPGLevelingComponent* GetLevelingComponent();
+
+	UFUNCTION(BlueprintCallable)
+	static URPGAttributeComponent* GetAttributeComponent();
+
+	UFUNCTION(BlueprintCallable)
+	static URPGCraftingComponent* GetCraftingComponent();
+
 public:
-	static void ItemData_Array_Set(TArray<FRPGItemData>& TargetArray, int32 Index, const FRPGItemData Item = FRPGItemData(), bool bSizeToFit = false);
+	UFUNCTION(BlueprintCallable)
+	static bool IsItemValid(const FRPGItemData ItemData);
+
+	//static void ItemData_Array_Set(TArray<FRPGItemData>& TargetArray, int32 Index, const FRPGItemData Item = FRPGItemData(), bool bSizeToFit = false);
 	static bool ItemType_Map_Find(const TMap<EItemType, int32>& TargetMap, const EItemType& Key, int32& Value);
 	static bool ItemMap_Map_Find(const TMap<int32, FRPGItemData>& TargetMap, const int32& Key, FRPGItemData& Value);
 

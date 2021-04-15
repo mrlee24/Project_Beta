@@ -5,6 +5,7 @@
 #include "Engine/DataTable.h"
 #include "Styling/SlateBrush.h"
 #include "Components/TimelineComponent.h"
+#include "Components/Widget.h"
 #include "Libraries/MeshMergeFunctionLibrary.h"
 #include "RPGTypes.generated.h"
 
@@ -51,6 +52,9 @@ enum class EWidgetType : uint8
 	Inventory,
 	Equipment,
 	Crafting,
+	Status,
+	Map,
+	Quest,
 	Vendor,
 	Storage,
 	LoadGame,
@@ -163,12 +167,12 @@ enum class EItemType : uint8
 	None,
 	Weapon,
 	Armor,
-	Ammo,
-	Accessory,
-	Potion,
+	Consumable,
 	CraftingIngredient,
 	QuestItem,
-	Currency
+	Currency,
+
+	Max UMETA(Hidden)
 };
 
 UENUM(BlueprintType)
@@ -215,7 +219,9 @@ enum class EStatCategory : uint8
 	MaxMana,
 	Armor,
 	Damage,
-	AttackSpeed
+	AttackSpeed,
+
+	Max UMETA(Hidden)
 };
 
 UENUM(BlueprintType)
@@ -280,22 +286,22 @@ struct FRPGConsumableAction
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EEffectCategory Category;
+	EEffectCategory Category = EEffectCategory::None;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EStatCategory Stat;
+	EStatCategory Stat = EStatCategory::None;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Value;
+	float Value = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 NumberOfRepetitions;
+	int32 NumberOfRepetitions = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Duration;
+	float Duration = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EAdditionalEffect AdditionEffect;
+	EAdditionalEffect AdditionEffect = EAdditionalEffect::None;
 };
 
 USTRUCT(BlueprintType)
@@ -359,16 +365,14 @@ struct FRPGRandomIntegerValue
 {
 	GENERATED_BODY()
 
-	FRPGRandomIntegerValue() {}
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Integer Randomizer")
+	int32 MinValue = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Integer Randomizer")
-	int32 MinValue;
+	int32 MaxValue = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Integer Randomizer")
-	int32 MaxValue;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Integer Randomizer")
-	UDataTable* MultiplierDataTable;
+	UDataTable* MultiplierDataTable = nullptr;
 };
 
 USTRUCT(BlueprintType)
@@ -376,16 +380,14 @@ struct FRPGRandomFloatValue
 {
 	GENERATED_BODY()
 
-	FRPGRandomFloatValue() {}
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Float Randomizer")
+	float MinValue = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Float Randomizer")
-	float MinValue;
+	float MaxValue = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Float Randomizer")
-	float MaxValue;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Float Randomizer")
-	UDataTable* MultiplierDataTable;
+	UDataTable* MultiplierDataTable = nullptr;
 };
 
 USTRUCT(BlueprintType)
@@ -414,10 +416,10 @@ struct FRPGItemDurability
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Stat Row")
-	bool bUseDurability;
+	bool bUseDurability = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Stat Row")
-	int32 CurrentDurability;
+	int32 CurrentDurability = 0;
 };
 
 USTRUCT(BlueprintType)
@@ -425,19 +427,20 @@ struct FRPGItemStat
 {
 	GENERATED_BODY()
 
-	FRPGItemStat() {}
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Stats")
+	float Weight = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Stats")
-	float Weight;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Stats")
-	float Value;
+	float Value = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Stats")
 	TArray<FRPGStatRow> Stats;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Stats")
-	int32 Level;
+	int32 Level = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Stats")
+	int32 RequiredLevel = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Stats")
 	FRPGConsumableAction ConsumableAction;
@@ -451,13 +454,11 @@ struct FRPGItemStack
 {
 	GENERATED_BODY()
 
-	FRPGItemStack() {}
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Stack")
+	bool bStackable = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Stack")
-	bool bStackable;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Stack")
-	int32 Quantity;
+	int32 Quantity = 0;
 };
 
 USTRUCT(BlueprintType)
@@ -465,16 +466,14 @@ struct FRPGItemUse
 {
 	GENERATED_BODY()
 
-	FRPGItemUse() {}
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Use")
+	EItemUseType UseableType = EItemUseType::None;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Use")
-	EItemUseType UseableType;
+	bool bIsAlreadyUsed = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Use")
-	bool bIsAlreadyUsed;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Use")
-	EItemRemoveType RemoveType;
+	EItemRemoveType RemoveType = EItemRemoveType::None;
 };
 
 USTRUCT(BlueprintType)
@@ -499,22 +498,20 @@ struct FRPGItemRandomLoot
 {
 	GENERATED_BODY()
 
-	FRPGItemRandomLoot() {}
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Random Loot")
+	int32 DropPercentage = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Random Loot")
-	int32 DropPercentage;
+	int32 MinQuantity = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Random Loot")
-	int32 MinQuantity;
+	int32 MaxQuantity = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Random Loot")
-	int32 MaxQuantity;
+	int32 MinDurability = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Random Loot")
-	int32 MinDurability;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Random Loot")
-	int32 MaxDurability;
+	int32 MaxDurability = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Random Loot")
 	TArray<FRPGItemRandomStats> RandomStats;
@@ -532,16 +529,16 @@ struct PROJECT_BETA_API FRPGItemDescription
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString ID;
+	FString ID = TEXT("");
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FText Name;
+	FText Name = FText::FromString("");
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FText Description;
+	FText Description = FText::FromString("");
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FText ReadableText;
+	FText ReadableText = FText::FromString("");
 };
 
 USTRUCT(BlueprintType)
@@ -551,7 +548,8 @@ struct PROJECT_BETA_API FRPGItemSlot
 
 	/** Constructor, -1 means an invalid slot */
 		FRPGItemSlot()
-		: SlotNumber(-1)
+		: ItemType(EItemType::None)
+		, SlotNumber(-1)
 	{}
 
 	FRPGItemSlot(const EItemType& InItemType, int32 InSlotNumber)
@@ -600,31 +598,25 @@ struct PROJECT_BETA_API FRPGItemData : public FTableRowBase
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	EItemType Type;
+	EItemType Type = EItemType::None;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	EItemRarity Rarity;
+	EItemRarity Rarity = EItemRarity::None;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	FRPGItemSlot Slot;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	EWeaponCategory WeaponCategory;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	TArray<EWeaponType> WeaponTypes;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-	EInventoryPanel InventoryPanel;
+	EWeaponCategory WeaponCategory = EWeaponCategory::None;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defaults")
-	TSubclassOf<ARPGItemBase> Class;
+	TSubclassOf<ARPGItemBase> Class = NULL;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defaults")
-	UStaticMesh* EquippableStaticMesh;
+	UStaticMesh* EquippableStaticMesh = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defaults")
-	USkeletalMesh* EquippableSkeletalMesh;
+	USkeletalMesh* EquippableSkeletalMesh = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defaults")
 	FSkeletalMeshMergeParams MeshMergeParameters;
@@ -633,7 +625,7 @@ struct PROJECT_BETA_API FRPGItemData : public FTableRowBase
 	FSlateBrush Thumbnail;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defaults")
-	int32 Index;
+	int32 Index = -1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Description")
 	FRPGItemDescription Description;
@@ -648,7 +640,7 @@ struct PROJECT_BETA_API FRPGItemData : public FTableRowBase
 	FRPGItemUse Use;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defaults")
-	bool bEquipped;
+	bool bEquipped = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Randomizer")
 	FRPGItemRandomLoot LootRandomizer;
@@ -665,7 +657,7 @@ struct PROJECT_BETA_API FRPGItemData : public FTableRowBase
 
 	bool IsValid() const 
 	{
-		return Type != EItemType::None;
+		return Type != EItemType::None && Type != EItemType::Max;
 	}
 
 	bool IsStackable() const 

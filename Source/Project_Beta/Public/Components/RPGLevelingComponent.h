@@ -13,7 +13,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLevelChanged);
 
 class URPGLevelExpNotifyWidget;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
 class PROJECT_BETA_API URPGLevelingComponent : public UActorComponent
 {
 	GENERATED_BODY()

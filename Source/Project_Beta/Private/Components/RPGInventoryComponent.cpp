@@ -5,15 +5,25 @@
 #include "Components/RPGInteractableComponent.h"
 #include "Widgets/VendorAndStorage/RPGVendorWidget.h"
 #include "Widgets/Inventory/RPGGoldWeightBarWidget.h"
+#include "Widgets/Inventory/RPGInventoryBaseWidget.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Libraries/RPGInventoryFunctionLibrary.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Captures/RPGItemCaptureBase.h"
 
 TArray<FRPGItemData>* URPGInventoryComponent::SelectCorrectInventory(const FRPGItemData ItemData)
 {
-	if (ItemData.Type == EItemType::None) return nullptr;
+	if (ItemData.Type == EItemType::None || ItemData.Type == EItemType::Currency || ItemData.Type == EItemType::Max) return nullptr;
 
 	return GetInventoryByType(ItemData.Type);
+}
+
+TArray<FRPGItemData>* URPGInventoryComponent::SelectCorrectInventory(const EItemType Type)
+{
+	if (Type == EItemType::None || Type == EItemType::Currency || Type == EItemType::Max) return nullptr;
+
+	return GetInventoryByType(Type);
 }
 
 void URPGInventoryComponent::AssignItemsToCorrectInventory(const EItemType Type, TArray<FRPGItemData> ItemsArray)
@@ -35,7 +45,7 @@ TArray<FRPGItemData>* URPGInventoryComponent::GetInventoryByType(const EItemType
 
 void URPGInventoryComponent::SortEveryPanel(const ESortMethod Selection)
 {
-	for (int32 Index = (int32)EItemType::Weapon; Index <= (int32)EItemType::Currency; ++Index)
+	for (int32 Index = (int32)EItemType::None; Index < (int32)EItemType::Max; Index++)
 	{
 		const EItemType Type = static_cast<EItemType>(Index);
 
@@ -103,6 +113,45 @@ URPGInventoryComponent::URPGInventoryComponent()
 void URPGInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SetupInventoryData();
+}
+
+void URPGInventoryComponent::SetupInventoryData_Implementation()
+{
+	//FRPGInventoryPanelData InventoryPanelData;
+	//InventoryPanelData.Size = InventoryMaxSize;
+
+	//InventoryData.Add(EItemType::Weapon, InventoryPanelData);
+	//InventoryData.Add(EItemType::Armor, InventoryPanelData);
+	//InventoryData.Add(EItemType::Consumable, InventoryPanelData);
+	//InventoryData.Add(EItemType::CraftingIngredient, InventoryPanelData);
+	//InventoryData.Add(EItemType::QuestItem, InventoryPanelData);
+}
+
+void URPGInventoryComponent::SetupInitialInventory_Implementation()
+{
+	for (auto& ArrayElement : InitialInventory)
+	{
+		FRPGItemData ItemData = *ArrayElement.TableAndRow.DataTable->FindRow<FRPGItemData>(ArrayElement.TableAndRow.RowName, "", true);
+
+		if (ItemData.IsValid())
+		{
+			bool bSuccess = false;
+			ItemData.Stacks.Quantity = (ArrayElement.Quantity > 0) ? ArrayElement.Quantity : 1;
+			AddItemToInventory(ItemData, bSuccess);
+		}
+	}
+}
+
+void URPGInventoryComponent::ToggleGamepadControls_Implementation(const bool bIsUsingGamepad)
+{
+	if (bIsUsingGamepad != bGamepadControls)
+	{
+		bGamepadControls = bIsUsingGamepad;
+		OnGamepadToggled.Broadcast(bIsUsingGamepad);
+		UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetMouseLocation(0, 0);
+	}
 }
 
 void URPGInventoryComponent::TryToAddToInventory(const FRPGItemData ItemData, int32& AddedSlotIndex, bool& bInventoryFull)
@@ -197,6 +246,11 @@ bool URPGInventoryComponent::CheckInventorySpace(const EItemType Type)
 	return URPGInventoryFunctionLibrary::HasSpaceInDataArray(*GetInventoryByType(Type), SlotIndex);
 }
 
+void URPGInventoryComponent::HighlightInventorySlot(const int32 SlotIndex)
+{
+	InventoryBase_Widget->HighlightSlot(SlotIndex);
+}
+
 void URPGInventoryComponent::ReplaceItemInInventory(const FRPGItemData ItemData)
 {
 	(*SelectCorrectInventory(ItemData))[ItemData.Index] = ItemData;
@@ -221,6 +275,11 @@ void URPGInventoryComponent::CanBeAddedToSlotInInventory(const FRPGItemData Item
 	}
 
 	bAdded = true;
+}
+
+void URPGInventoryComponent::AddItemToInventory(const FRPGItemData ItemData, bool& bSuccess)
+{
+
 }
 
 bool URPGInventoryComponent::IsPlayerGoldEnough(const FRPGItemData ItemData) const
@@ -308,6 +367,35 @@ void URPGInventoryComponent::QuickSort(const EItemType Type)
 {
 	if (Type == EItemType::None) return;
 
-	AssignItemsToCorrectInventory(Type, URPGInventoryFunctionLibrary::QuickSortItems(*GetInventoryByType(Type)));
+	//AssignItemsToCorrectInventory(Type, URPGInventoryFunctionLibrary::QuickSortItems(*GetInventoryByType(Type)));
+}
+
+void URPGInventoryComponent::AssignCurrentWidgetInput(const EInputMethod InputMethod, const EWidgetType WidgetType)
+{
+	CurrentInputMethod = InputMethod;
+	CurrentWidgetInput = WidgetType;
+}
+
+void URPGInventoryComponent::GetCurrentWidgetInput(EInputMethod& InputMethod, EWidgetType& WidgetType)
+{
+	InputMethod = CurrentInputMethod;
+	WidgetType = CurrentWidgetInput;
+}
+
+void URPGInventoryComponent::ResetCaptureRotation()
+{
+	FRotator RelativeRotation = ItemCaptureRef->GetSkeletalMeshComponent()->GetRelativeRotation();
+
+	ItemCaptureRef->GetSkeletalMeshComponent()->SetRelativeRotation(FRotator(RelativeRotation.Roll, RelativeRotation.Yaw, 0));
+}
+
+void URPGInventoryComponent::PassItemCaptureReference(ARPGItemCaptureBase* InItemCaptureRef)
+{
+	ItemCaptureRef = InItemCaptureRef;
+}
+
+FSlateColor URPGInventoryComponent::SetRarityColor(const EItemRarity Rarity) const
+{
+	return FSlateColor();
 }
 

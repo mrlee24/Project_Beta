@@ -5,11 +5,25 @@
 #include "Libraries/RPGInventoryFunctionLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 
+FRPGStatRow* URPGAttributeComponent::FindStatInStatsArray(const EStatCategory InStat, bool& bFound)
+{
+	const float StatIndex = GetStatIndex(InStat);
+
+	if (StatIndex > -1)
+	{
+		bFound = true;
+		return &Stats[StatIndex];
+	}
+
+	bFound = false;
+	return nullptr;
+}
+
 void URPGAttributeComponent::FindStatInStatsArray(const EStatCategory InStat, bool& bFound, FRPGStatRow& OutStatRow) const
 {
 	const float StatIndex = GetStatIndex(InStat);
 
-	if (StatIndex != -1)
+	if (StatIndex > -1)
 	{
 		bFound = true;
 		OutStatRow = Stats[StatIndex];
@@ -88,32 +102,30 @@ void URPGAttributeComponent::SetStatValue(const EStatCategory Stat, const float 
 
 void URPGAttributeComponent::AddItemStats(const FRPGItemData ItemData)
 {
-	for (auto& StatRow : ItemData.Stats.Stats)
+	for (auto& StatElement : ItemData.Stats.Stats)
 	{
 		bool bFound = false;
-		FRPGStatRow OutStatRow;
-		FindStatInStatsArray(StatRow.Stat, bFound, OutStatRow);
+		FRPGStatRow* StatRow = FindStatInStatsArray(StatElement.Stat, bFound);
 
 		if (bFound)
 		{
-			float ValueModifier = OutStatRow.Value + StatRow.Value;
-			OutStatRow.Value = ClampToMaxStatValues(OutStatRow.Stat, ValueModifier);
+			const float ValueModifier = StatRow->Value + StatElement.Value;
+			StatRow->Value = ClampToMaxStatValues(StatElement.Stat, ValueModifier);
 		}
 	}
 }
 
 void URPGAttributeComponent::RemoveItemStats(const FRPGItemData ItemData)
 {
-	for (auto& StatRow : ItemData.Stats.Stats)
+	for (auto& StatElement : ItemData.Stats.Stats)
 	{
 		bool bFound = false;
-		FRPGStatRow OutStatRow;
-		FindStatInStatsArray(StatRow.Stat, bFound, OutStatRow);
+		FRPGStatRow* StatRow = FindStatInStatsArray(StatElement.Stat, bFound);
 
 		if (bFound)
 		{
-			float ValueModifier = OutStatRow.Value - StatRow.Value;
-			OutStatRow.Value = ClampToMaxStatValues(OutStatRow.Stat, ValueModifier);
+			const float ValueModifier = StatRow->Value - StatElement.Value;
+			StatRow->Value = ClampToMaxStatValues(StatElement.Stat, ValueModifier);
 		}
 	}
 }
